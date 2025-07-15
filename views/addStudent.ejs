@@ -1,57 +1,42 @@
 <%- include('partials/head',{ title:'Add Student' }) %>
-<%- include('partials/nav') %>
+  <%- include('partials/nav') %>
 
-<div class="container">
-  <div class="card card-glass mx-auto" style="max-width:600px;">
-    <div class="card-body">
-      <h2 class="mb-4 text-center">Add Student</h2>
-      <form action="/students/add" method="POST">
-        <div class="mb-3">
-          <label class="form-label">Name</label>
-          <input
-            name="name"
-            class="form-control"
-            value="<%= name %>"
-            required
-          >
+    <div class="container">
+      <div class="card card-glass mx-auto" style="max-width:600px;">
+        <div class="card-body">
+          <h2 class="mb-4 text-center">Add Student</h2>
+          <form action="/students/add" method="POST">
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input name="name" class="form-control" value="<%= name %>" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Roll Number</label>
+              <input name="rollNumber" type="number" class="form-control" value="<%= rollNumber %>" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Class</label>
+              <select name="className" class="form-select" required>
+                <option value="" disabled <%=!className ? 'selected' : '' %>>Select a class</option>
+                <% classes.forEach(c=> { %>
+                  <option value="<%= c.name %>" <%=className===c.name ? 'selected' : '' %>><%= c.name %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+
+            <div class="text-center">
+              <button class="btn btn-custom me-2">Save</button>
+              <a href="/students" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+          <% if (error) { %>
+            <script>alert("<%= error %>");</script>
+            <% } %>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Roll Number</label>
-          <input
-            name="rollNumber"
-            type="number"
-            class="form-control"
-            value="<%= rollNumber %>"
-            required
-          >
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Class</label>
-          <input
-            list="classList"
-            name="className"
-            class="form-control"
-            value="<%= className %>"
-            placeholder="Type or select…"
-            required
-          >
-          <datalist id="classList">
-            <% classes.forEach(c=>{ %>
-              <option value="<%= c.name %>">
-            <% }) %>
-          </datalist>
-        </div>
-        <div class="text-center">
-          <button class="btn btn-custom me-2">Save</button>
-          <a href="/students" class="btn btn-secondary">Cancel</a>
-        </div>
-      </form>
-      <% if (error) { %>
-        <script>alert("<%= error %>");</script>
-      <% } %>
+      </div>
     </div>
-  </div>
-</div>
 
-</body>
-</html>
+    </body>
+
+    </html>

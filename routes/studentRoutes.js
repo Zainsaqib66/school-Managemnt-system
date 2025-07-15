@@ -92,10 +92,15 @@ router.post('/edit/:id', async (req, res) => {
 router.post('/delete/:id', async (req, res) => {
   const student = await Student.findById(req.params.id);
   const redirectClass = student?.class;
+
   await Student.findByIdAndDelete(req.params.id);
+
+  const message = `Student '${student?.name || ''}' deleted`;
+
   return redirectClass
-    ? res.redirect(`/classes/${encodeURIComponent(redirectClass)}`)
-    : res.redirect('/students');
+    ? res.redirect(`/classes/${encodeURIComponent(redirectClass)}?message=${encodeURIComponent(message)}`)
+    : res.redirect(`/students?message=${encodeURIComponent(message)}`);
 });
+
 
 module.exports = router;
