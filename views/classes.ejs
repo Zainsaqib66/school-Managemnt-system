@@ -1,0 +1,63 @@
+<%- include('partials/head',{ title:'Classes' }) %>
+<%- include('partials/nav') %>
+
+<div class="container">
+  <div class="card card-glass mx-auto" style="max-width:600px;">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-3">
+        <input class="form-control search-input" placeholder="Search Classes…">
+        <button
+          class="btn btn-success"
+          data-bs-toggle="modal"
+          data-bs-target="#addClassModal"
+        >+ Add Class</button>
+      </div>
+      <h2 class="card-title text-center mb-4">All Classes</h2>
+      <div class="list-group">
+        <% classes.forEach(c=>{ %>
+          <a
+            href="/classes/<%= encodeURIComponent(c.name) %>"
+            class="list-group-item list-group-item-action"
+          ><%= c.name %></a>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Class Modal -->
+<div class="modal fade" id="addClassModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="/classes/add" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Class</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <input
+            name="name"
+            class="form-control"
+            placeholder="Class Name"
+            required
+          >
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >Cancel</button>
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

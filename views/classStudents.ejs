@@ -1,0 +1,56 @@
+<%- include('partials/head',{ title:'Students in ' + className }) %>
+<%- include('partials/nav') %>
+
+<div class="container">
+  <div class="card card-glass mx-auto" style="max-width:800px;">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-3">
+        <input class="form-control search-input" placeholder="Search Students…">
+        <a
+          href="/students/add?className=<%= encodeURIComponent(className) %>"
+          class="btn btn-success"
+        >+ Add Student</a>
+      </div>
+      <h2 class="card-title text-center mb-4">Students in <%= className %></h2>
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Roll #</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% students.forEach(s=>{ %>
+            <tr>
+              <td><%= s.name %></td>
+              <td><%= s.rollNumber %></td>
+              <td><%= s.createdAt? s.createdAt.toLocaleString(): '' %></td>
+              <td><%= s.updatedAt? s.updatedAt.toLocaleString(): '' %></td>
+              <td>
+                <a
+                  href="/students/edit/<%= s._id %>?fromClass=<%= encodeURIComponent(className) %>"
+                  class="btn btn-sm btn-warning me-1"
+                >Edit</a>
+                <form
+                  method="POST"
+                  action="/students/delete/<%= s._id %>"
+                  style="display:inline"
+                  onsubmit="return confirm('Delete <%= s.name %>?');"
+                >
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <a href="/classes" class="btn btn-secondary">← Back to Classes</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
