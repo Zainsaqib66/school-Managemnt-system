@@ -1,9 +1,10 @@
+// routes/studentRoutes.js
 const express = require('express');
 const router  = express.Router();
 const Class   = require('../models/class');
 const Student = require('../models/student');
 
-// helper to load all classes
+// Helper to load all classes
 async function loadClasses() {
   return Class.find().sort('name');
 }
@@ -25,36 +26,38 @@ router.get('/', async (req, res) => {
   }
 });
 
-// SHOW add-student form (preselect class if passed)
+// SHOW add-student form
 router.get('/add', async (req, res) => {
-  const classes     = await loadClasses();
-  const defaultClass = req.query.className || '';
+  const classes        = await loadClasses();
+  const defaultClass   = req.query.className || '';
+  const defaultSection = req.query.section   || '';
   res.render('addStudent', {
     error:   null,
-    student: { className: defaultClass },
+    student: { className: defaultClass, section: defaultSection },
     classes
   });
 });
 
 // CREATE new student
 router.post('/add', async (req, res) => {
+  const classes = await loadClasses();
   const {
     name, rollNumber, className,
-    dob, gender, address, phone, email,
+    section, dob, gender,
+    address, phone, email,
     fatherName, motherName, guardianContact,
-    admissionDate, section
+    admissionDate
   } = req.body;
 
-  const classes = await loadClasses();
-
-  // validation
-  if (!name || !rollNumber || !className) {
+  // Required fields
+  if (!name || !rollNumber || !className || !section) {
     return res.render('addStudent', {
-      error:   'Name, Roll # and Class are required',
+      error:   'Name, Roll #, Class & Section are required',
       student: req.body,
       classes
     });
   }
+  // Class must exist
   if (!await Class.exists({ name: className })) {
     return res.render('addStudent', {
       error:   'Selected class does not exist',
@@ -62,6 +65,7 @@ router.post('/add', async (req, res) => {
       classes
     });
   }
+  // Roll number unique
   if (await Student.exists({ rollNumber })) {
     return res.render('addStudent', {
       error:   'Roll number already in use',
@@ -75,17 +79,18 @@ router.post('/add', async (req, res) => {
       name,
       rollNumber,
       className,
+      section,
       dob,
       gender,
       address,
       phone,
       email,
       guardian: { fatherName, motherName, contact: guardianContact },
-      admissionDate,
-      section
+      admissionDate
     });
-    res.redirect('/students');
-  } catch {
+    res.redirect('/students?message=Student+added');
+  } catch (err) {
+    console.error(err);
     res.render('addStudent', {
       error:   'Unable to create student',
       student: req.body,
@@ -117,53 +122,73 @@ router.get('/edit/:id', async (req, res) => {
   }
 });
 
-// UPDATE student
+// UPDATE student — require name, rollNumber, className, section; allow partial update
 router.post('/edit/:id', async (req, res) => {
-  const {
-    name, rollNumber, className,
-    dob, gender, address, phone, email,
-    fatherName, motherName, guardianContact,
-    admissionDate, section
-  } = req.body;
   const classes = await loadClasses();
+  let {
+    name,
+    rollNumber,
+    className,
+    section,
+    dob, gender,
+    address, phone, email,
+    fatherName, motherName, guardianContact,
+    admissionDate
+  } = req.body;
 
-  // validation
-  if (!name || !rollNumber || !className) {
+  // Coerce section to string if array
+  if (Array.isArray(section)) {
+    section = section[0];
+  }
+
+  // Required fields
+  if (!name || !rollNumber || !className || !section) {
     return res.render('editStudent', {
-      error:   'Name, Roll # and Class are required',
-      student: { _id: req.params.id, ...req.body },
+      error:   'Name, Roll #, Class & Section are required',
+      student: { _id: req.params.id, ...req.body, section },
       classes
     });
   }
+  // Class must exist
   if (!await Class.exists({ name: className })) {
     return res.render('editStudent', {
       error:   'Selected class does not exist',
-      student: { _id: req.params.id, ...req.body },
+      student: { _id: req.params.id, ...req.body, section },
       classes
     });
   }
 
+  // Build update object
+  const update = {
+    name,
+    rollNumber,
+    className,
+    section,
+    dob,
+    gender,
+    address,
+    phone,
+    email,
+    admissionDate,
+    guardian: {
+      fatherName,
+      motherName,
+      contact: guardianContact
+    }
+  };
+
   try {
-    const student = await Student.findById(req.params.id);
-    Object.assign(student, {
-      name,
-      rollNumber,
-      className,
-      dob,
-      gender,
-      address,
-      phone,
-      email,
-      guardian: { fatherName, motherName, contact: guardianContact },
-      admissionDate,
-      section
-    });
-    await student.save();
-    res.redirect('/students');
-  } catch {
+    await Student.findByIdAndUpdate(
+      req.params.id,
+      update,
+      { new: true, runValidators: true, context: 'query' }
+    );
+    res.redirect('/students?message=Student+updated');
+  } catch (err) {
+    console.error(err);
     res.render('editStudent', {
       error:   'Unable to update student',
-      student: { _id: req.params.id, ...req.body },
+      student: { _id: req.params.id, ...req.body, section },
       classes
     });
   }

@@ -2,7 +2,7 @@
 <%- include('partials/nav') %>
 
 <div class="container my-5">
-  <div class="card mx-auto shadow-lg" style="max-width: 800px; border-radius: 1rem;">
+  <div class="card mx-auto shadow-lg" style="max-width: 900px; border-radius: 1rem; background: #fff;">
     <div class="card-body p-5">
       <h2 class="text-center mb-4">Edit Student</h2>
 
@@ -11,100 +11,208 @@
       <% } %>
 
       <form action="/students/edit/<%= student._id %>" method="POST" novalidate>
+        <!-- Student Information -->
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Student Information</legend>
+          <div class="row g-3">
+            <!-- Name -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+              <input
+                name="name"
+                type="text"
+                class="form-control"
+                value="<%= student.name %>"
+                required
+              >
+            </div>
+            <!-- Roll Number -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Roll Number <span class="text-danger">*</span></label>
+              <input
+                name="rollNumber"
+                type="number"
+                class="form-control"
+                value="<%= student.rollNumber %>"
+                required
+              >
+            </div>
+            <!-- Class -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Class <span class="text-danger">*</span></label>
+              <select name="className" id="classSelect" class="form-select" required>
+                <option value="" disabled>Select class…</option>
+                <% classes.forEach(c => { %>
+                  <option
+                    value="<%= c.name %>"
+                    <%= student.className === c.name ? 'selected' : '' %>
+                  ><%= c.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <!-- Section -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Section <span class="text-danger">*</span></label>
+              <select name="section" id="sectionSelect" class="form-select" required>
+                <option value="" disabled>Select section…</option>
+              </select>
+            </div>
+            <!-- Date of Birth -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Date of Birth</label>
+              <input
+                name="dob"
+                type="date"
+                class="form-control"
+                value="<%= student.dob ? student.dob.toISOString().slice(0,10) : '' %>"
+              >
+            </div>
+            <!-- Admission Date -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Admission Date</label>
+              <input
+                name="admissionDate"
+                type="date"
+                class="form-control"
+                value="<%= student.admissionDate ? student.admissionDate.toISOString().slice(0,10) : '' %>"
+              >
+            </div>
+            <!-- Gender -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="" disabled>Select gender…</option>
+                <option value="M" <%= student.gender==='M'?'selected':'' %>>Male</option>
+                <option value="F" <%= student.gender==='F'?'selected':'' %>>Female</option>
+                <option value="Other" <%= student.gender==='Other'?'selected':'' %>>Other</option>
+              </select>
+            </div>
+            <!-- Section input fallback if needed -->
+            <div class="col-md-6 d-none">
+              <input type="text" name="section" class="form-control" value="<%= student.section %>">
+            </div>
+          </div>
+        </fieldset>
 
-        <!-- Section: Student Info -->
-        <h5 class="mb-3 text-primary border-bottom pb-2">Student Info</h5>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Name <span class="text-danger">*</span></label>
-            <input name="name" class="form-control" value="<%= student.name %>" required>
+        <!-- Contact Information -->
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Contact Information</legend>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Phone</label>
+              <input
+                name="phone"
+                type="tel"
+                pattern="[0-9]{10,15}"
+                class="form-control"
+                value="<%= student.phone||'' %>"
+              >
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Email</label>
+              <input
+                name="email"
+                type="email"
+                class="form-control"
+                value="<%= student.email||'' %>"
+              >
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold">Address</label>
+              <input
+                name="address"
+                type="text"
+                class="form-control"
+                value="<%= student.address||'' %>"
+              >
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Roll Number <span class="text-danger">*</span></label>
-            <input name="rollNumber" type="number" class="form-control" value="<%= student.rollNumber %>" required>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Class <span class="text-danger">*</span></label>
-            <select name="className" class="form-select" required>
-              <% classes.forEach(c => { %>
-                <option value="<%= c.name %>" <%= student.className === c.name ? 'selected' : '' %>><%= c.name %></option>
-              <% }) %>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Section</label>
-            <input name="section" class="form-control" value="<%= student.section || '' %>">
-          </div>
-        </div>
+        </fieldset>
 
-        <!-- Date of Birth and Gender -->
-        <div class="row g-3 mt-3">
-          <div class="col-md-6">
-            <label class="form-label">Date of Birth</label>
-            <input name="dob" type="date" class="form-control"
-              value="<%= student.dob ? student.dob.toISOString().split('T')[0] : '' %>">
+        <!-- Guardian Information -->
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Guardian Information</legend>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Father’s Name</label>
+              <input
+                name="fatherName"
+                type="text"
+                class="form-control"
+                value="<%= student.guardian?.fatherName||'' %>"
+              >
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Mother’s Name</label>
+              <input
+                name="motherName"
+                type="text"
+                class="form-control"
+                value="<%= student.guardian?.motherName||'' %>"
+              >
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Guardian Contact</label>
+              <input
+                name="guardianContact"
+                type="tel"
+                pattern="[0-9]{10,15}"
+                class="form-control"
+                value="<%= student.guardian?.contact||'' %>"
+              >
+            </div>
           </div>
-          <div class="col-md-6">
-            <label class="form-label">Gender</label>
-            <select name="gender" class="form-select">
-              <option value="">Select gender…</option>
-              <option value="M" <%= student.gender === 'M' ? 'selected' : '' %>>Male</option>
-              <option value="F" <%= student.gender === 'F' ? 'selected' : '' %>>Female</option>
-              <option value="Other" <%= student.gender === 'Other' ? 'selected' : '' %>>Other</option>
-            </select>
-          </div>
-        </div>
+        </fieldset>
 
-        <!-- Section: Contact Info -->
-        <h5 class="mt-4 mb-3 text-primary border-bottom pb-2">Contact Info</h5>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Phone</label>
-            <input name="phone" type="tel" pattern="^[0-9+\-()\s]{7,15}$" class="form-control"
-              placeholder="e.g. 0300-1234567" value="<%= student.phone || '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Email</label>
-            <input name="email" type="email" class="form-control" value="<%= student.email || '' %>">
-          </div>
-        </div>
-        <div class="mt-3">
-          <label class="form-label">Address</label>
-          <input name="address" class="form-control" value="<%= student.address || '' %>">
-        </div>
-
-        <!-- Section: Guardian Info -->
-        <h5 class="mt-4 mb-3 text-primary border-bottom pb-2">Guardian Info</h5>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">Father’s Name</label>
-            <input name="fatherName" class="form-control" value="<%= student.guardian?.fatherName || '' %>">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Mother’s Name</label>
-            <input name="motherName" class="form-control" value="<%= student.guardian?.motherName || '' %>">
-          </div>
-        </div>
-        <div class="mt-3">
-          <label class="form-label">Guardian Contact</label>
-          <input name="guardianContact" class="form-control" type="tel"
-            pattern="^[0-9+\-()\s]{7,15}$" placeholder="e.g. 0321-8765432"
-            value="<%= student.guardian?.contact || '' %>">
-        </div>
-
-        <!-- Submit Buttons -->
+        <!-- Actions -->
         <div class="text-center mt-4">
-          <button type="submit" class="btn btn-success px-4">
+          <button type="submit" class="btn btn-success px-4 me-2">
             <i class="bi bi-check-circle me-1"></i> Update
           </button>
-          <a href="/students" class="btn btn-secondary ms-3">
+          <a href="/students" class="btn btn-secondary px-4">
             <i class="bi bi-x-circle me-1"></i> Cancel
           </a>
         </div>
-
       </form>
     </div>
   </div>
 </div>
+
+<script>
+  const classSelect   = document.getElementById('classSelect');
+  const sectionSelect = document.getElementById('sectionSelect');
+  const preSection    = '<%= student.section||"" %>';
+  const preClass      = '<%= student.className||"" %>';
+
+  async function loadSections(cls, selectDefault = "") {
+    sectionSelect.innerHTML = '<option>Loading…</option>';
+    try {
+      const res  = await fetch(`/classes/api/${encodeURIComponent(cls)}`);
+      const list = await res.json();
+      sectionSelect.innerHTML =
+        '<option value="" disabled>Select section…</option>' +
+        list.map(name =>
+          `<option value="${name}" ${name===selectDefault?'selected':''}>${name}</option>`
+        ).join('');
+    } catch {
+      sectionSelect.innerHTML = '<option value="">Error loading</option>';
+    }
+  }
+
+  // Reload sections when class changes
+  classSelect.addEventListener('change', () => {
+    if (classSelect.value) {
+      loadSections(classSelect.value);
+    }
+  });
+
+  // Initialize on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    if (preClass) {
+      classSelect.value = preClass;
+      loadSections(preClass, preSection);
+    }
+  });
+</script>
 </body>
 </html>
