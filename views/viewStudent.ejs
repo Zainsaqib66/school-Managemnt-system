@@ -1,0 +1,65 @@
+<%- include('partials/head', { title: 'View Student' }) %>
+<%- include('partials/nav') %>
+
+<div class="container my-5">
+  <div class="card mx-auto shadow-lg" style="max-width:700px; border-radius:1rem;">
+    <div class="card-body p-5">
+      <h2 class="text-center mb-4">Student Details</h2>
+      <dl class="row fs-5">
+        <dt class="col-sm-4">Name</dt>
+        <dd class="col-sm-8"><%= student.name %></dd>
+
+        <dt class="col-sm-4">Roll Number</dt>
+        <dd class="col-sm-8"><%= student.rollNumber %></dd>
+
+        <dt class="col-sm-4">Class</dt>
+        <dd class="col-sm-8"><%= student.className %></dd>
+
+        <dt class="col-sm-4">Date of Birth</dt>
+        <dd class="col-sm-8"><%= student.dob ? student.dob.toLocaleDateString() : '—' %></dd>
+
+        <dt class="col-sm-4">Gender</dt>
+        <dd class="col-sm-8"><%= student.gender || '—' %></dd>
+
+        <dt class="col-sm-4">Phone</dt>
+        <dd class="col-sm-8"><%= student.phone || '—' %></dd>
+
+        <dt class="col-sm-4">Email</dt>
+        <dd class="col-sm-8"><%= student.email || '—' %></dd>
+
+        <dt class="col-sm-4">Father’s Name</dt>
+        <dd class="col-sm-8"><%= student.guardian?.fatherName || '—' %></dd>
+
+        <dt class="col-sm-4">Mother’s Name</dt>
+        <dd class="col-sm-8"><%= student.guardian?.motherName || '—' %></dd>
+
+        <dt class="col-sm-4">Guardian Contact</dt>
+        <dd class="col-sm-8"><%= student.guardian?.contact || '—' %></dd>
+
+        <dt class="col-sm-4">Admission Date</dt>
+        <dd class="col-sm-8"><%= student.admissionDate ? student.admissionDate.toLocaleDateString() : '—' %></dd>
+
+        <dt class="col-sm-4">Section</dt>
+        <dd class="col-sm-8"><%= student.section || '—' %></dd>
+
+        <dt class="col-sm-4">Created At</dt>
+        <dd class="col-sm-8"><%= student.createdAt.toLocaleString() %></dd>
+
+        <dt class="col-sm-4">Last Updated</dt>
+        <dd class="col-sm-8"><%= student.updatedAt.toLocaleString() %></dd>
+      </dl>
+
+      <div class="text-center mt-4">
+        <a href="/students/edit/<%= student._id %>" class="btn btn-warning btn-lg me-2">
+          Edit
+        </a>
+        <a href="/classes" class="btn btn-secondary btn-lg">
+          Back to Classes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

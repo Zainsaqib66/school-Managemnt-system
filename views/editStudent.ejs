@@ -1,62 +1,101 @@
-<%- include('partials/head',{ title:'Edit Student' }) %>
+<%- include('partials/head', { title: 'Edit Student' }) %>
 <%- include('partials/nav') %>
 
-<div class="container">
-  <div class="card card-glass mx-auto" style="max-width:600px;">
-    <div class="card-body">
-      <h2 class="mb-4 text-center">Edit Student</h2>
+<div class="container my-5">
+  <div class="card mx-auto shadow-lg" style="max-width:700px; border-radius:1rem;">
+    <div class="card-body p-5">
+      <h2 class="text-center mb-4">Edit Student</h2>
+
+      <% if (error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
       <form action="/students/edit/<%= student._id %>" method="POST">
-        <input type="hidden" name="fromClass" value="<%= fromClass %>">
-        <div class="mb-3">
-          <label class="form-label">Name</label>
-          <input
-            name="name"
-            class="form-control"
-            value="<%= student.name %>"
-            required
-          >
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input name="name" class="form-control" value="<%= student.name %>" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Roll Number</label>
+            <input name="rollNumber" type="number" class="form-control"
+                   value="<%= student.rollNumber %>" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Class</label>
+            <select name="className" class="form-select" required>
+              <% classes.forEach(c => { %>
+                <option value="<%= c.name %>"
+                  <%= student.className === c.name ? 'selected' : '' %>>
+                  <%= c.name %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Section</label>
+            <input name="section" class="form-control"
+                   value="<%= student.section||'' %>">
+          </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Roll Number</label>
-          <input
-            name="rollNumber"
-            type="number"
-            class="form-control"
-            value="<%= student.rollNumber %>"
-            required
-          >
+
+        <div class="mt-3">
+          <label class="form-label">Date of Birth</label>
+          <input name="dob" type="date" class="form-control"
+                 value="<%= student.dob
+                   ? student.dob.toISOString().split('T')[0]
+                   : '' %>">
         </div>
-        <div class="mb-3">
-          <label class="form-label">Class</label>
-          <input
-            list="classList"
-            name="className"
-            class="form-control"
-            value="<%= className %>"
-            required
-          >
-          <datalist id="classList">
-            <% classes.forEach(c=>{ %>
-              <option value="<%= c.name %>">
-            <% }) %>
-          </datalist>
+
+        <div class="mt-3">
+          <label class="form-label">Gender</label>
+          <select name="gender" class="form-select">
+            <option value="">Select gender…</option>
+            <option value="M" <%= student.gender==='M'?'selected':'' %>>Male</option>
+            <option value="F" <%= student.gender==='F'?'selected':'' %>>Female</option>
+            <option value="Other" <%= student.gender==='Other'?'selected':'' %>>Other</option>
+          </select>
         </div>
-        <div class="text-center">
-          <button class="btn btn-custom me-2">Update</button>
-          <a
-            href="<%= fromClass
-              ? '/classes/'+encodeURIComponent(fromClass)
-              : '/students' %>"
-            class="btn btn-secondary"
-          >Cancel</a>
+
+        <div class="mt-3">
+          <label class="form-label">Address</label>
+          <input name="address" class="form-control" value="<%= student.address||'' %>">
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Phone</label>
+          <input name="phone" class="form-control" value="<%= student.phone||'' %>">
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" value="<%= student.email||'' %>">
+        </div>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-6">
+            <label class="form-label">Father’s Name</label>
+            <input name="fatherName" class="form-control"
+                   value="<%= student.guardian?.fatherName||'' %>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mother’s Name</label>
+            <input name="motherName" class="form-control"
+                   value="<%= student.guardian?.motherName||'' %>">
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">Guardian Contact</label>
+          <input name="guardianContact" class="form-control"
+                 value="<%= student.guardian?.contact||'' %>">
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success px-4">Update</button>
+          <a href="/students" class="btn btn-secondary ms-3">Cancel</a>
         </div>
       </form>
-      <% if (error) { %>
-        <script>alert("<%= error %>");</script>
-      <% } %>
     </div>
   </div>
 </div>
-
 </body>
 </html>
