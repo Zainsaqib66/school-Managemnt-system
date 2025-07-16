@@ -27,15 +27,15 @@
         </div>
       <% } %>
 
-      <!-- Sections Table -->
+      <!-- Table -->
       <% if (sections.length === 0) { %>
-        <p class="text-center text-muted">No sections created yet.</p>
+        <p class="text-center text-muted">No sections found.</p>
       <% } else { %>
         <table class="table table-striped table-hover text-center">
           <thead class="table-light">
             <tr>
               <th>#</th>
-              <th>Section Name</th>
+              <th>Name</th>
               <th>Students</th>
               <th>Actions</th>
             </tr>
@@ -51,18 +51,22 @@
                      class="btn btn-sm btn-primary me-1">
                     <i class="bi bi-eye-fill me-1"></i> View
                   </a>
-                  <button class="btn btn-sm btn-warning me-1"
-                          data-bs-toggle="modal"
-                          data-bs-target="#editSectionModal"
-                          data-id="<%= sec._id %>"
-                          data-name="<%= sec.name %>">
+                  <button
+                    class="btn btn-sm btn-warning me-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editSectionModal"
+                    data-id="<%= sec._id %>"
+                    data-name="<%= sec.name %>"
+                  >
                     <i class="bi bi-pencil-square me-1"></i> Edit
                   </button>
-                  <button class="btn btn-sm btn-danger"
-                          data-bs-toggle="modal"
-                          data-bs-target="#deleteSectionModal"
-                          data-id="<%= sec._id %>"
-                          data-name="<%= sec.name %>">
+                  <button
+                    class="btn btn-sm btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteSectionModal"
+                    data-id="<%= sec._id %>"
+                    data-name="<%= sec.name %>"
+                  >
                     <i class="bi bi-trash-fill me-1"></i> Delete
                   </button>
                 </td>
@@ -86,7 +90,7 @@
     <form action="/classes/<%= encodeURIComponent(className) %>/sections/add" method="POST">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-plus-circle me-1"></i> Add Section</h5>
+          <h5 class="modal-title">Add Section</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -111,7 +115,7 @@
     <form id="editSectionForm" method="POST">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-pencil-square me-1"></i> Edit Section</h5>
+          <h5 class="modal-title">Edit Section</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -136,7 +140,7 @@
     <form id="deleteSectionForm" method="POST">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-trash-fill me-1"></i> Delete Section</h5>
+          <h5 class="modal-title">Delete Section</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -158,15 +162,13 @@
 <script>
   const currentClass = '<%= encodeURIComponent(className) %>';
 
-  // Edit Section Modal
+  // Modals wiring
   document.getElementById('editSectionModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('editSectionName').value = btn.dataset.name;
     document.getElementById('editSectionForm').action =
       `/classes/${currentClass}/sections/edit/${btn.dataset.id}`;
   });
-
-  // Delete Section Modal
   document.getElementById('deleteSectionModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('deleteSectionName').textContent = btn.dataset.name;
@@ -175,14 +177,14 @@
   });
 </script>
 
-<!-- Auto-dismiss alerts after 3s -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-      document.querySelectorAll('.alert').forEach(el => {
-        bootstrap.Alert.getOrCreateInstance(el).close();
-      });
+      document.querySelectorAll('.alert').forEach(el =>
+        bootstrap.Alert.getOrCreateInstance(el).close()
+      );
     }, 3000);
+    history.replaceState({}, document.title, location.pathname);
   });
 </script>
 

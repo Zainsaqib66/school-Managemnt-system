@@ -27,7 +27,7 @@
         </div>
       <% } %>
 
-      <!-- Classes Table -->
+      <!-- Table -->
       <% if (classes.length === 0) { %>
         <p class="text-center text-muted">No classes found.</p>
       <% } else { %>
@@ -35,9 +35,9 @@
           <thead class="table-light">
             <tr>
               <th>#</th>
-              <th>Class Name</th>
-              <th><i class="bi bi-people-fill me-1"></i> Students</th>
-              <th><i class="bi bi-grid-fill me-1"></i> Sections</th>
+              <th>Name</th>
+              <th>Students</th>
+              <th>Sections</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -94,7 +94,9 @@
           <input name="name" class="form-control" placeholder="Class Name" required>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+          </button>
           <button type="submit" class="btn btn-success">
             <i class="bi bi-check-circle me-1"></i> Save
           </button>
@@ -117,7 +119,9 @@
           <input name="name" id="editClassName" class="form-control" required>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+          </button>
           <button type="submit" class="btn btn-warning">
             <i class="bi bi-pencil-square me-1"></i> Update
           </button>
@@ -140,7 +144,9 @@
           Are you sure you want to delete <strong id="deleteClassName"></strong>?
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> No
+          </button>
           <button type="submit" class="btn btn-danger">
             <i class="bi bi-trash-fill me-1"></i> Yes, Delete
           </button>
@@ -151,30 +157,28 @@
 </div>
 
 <script>
-  // Edit Class Modal
+  // Modals wiring
   document.getElementById('editClassModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('editClassName').value = btn.dataset.name;
-    document.getElementById('editClassForm').action =
-      '/classes/edit/' + btn.dataset.id;
+    document.getElementById('editClassForm').action = '/classes/edit/' + btn.dataset.id;
   });
-  // Delete Class Modal
   document.getElementById('deleteClassModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('deleteClassName').textContent = btn.dataset.name;
-    document.getElementById('deleteClassForm').action =
-      '/classes/delete/' + btn.dataset.id;
+    document.getElementById('deleteClassForm').action = '/classes/delete/' + btn.dataset.id;
   });
 </script>
 
-<!-- Auto-dismiss alerts after 3s -->
+<!-- Auto-dismiss + URL clean -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-      document.querySelectorAll('.alert').forEach(el => {
-        bootstrap.Alert.getOrCreateInstance(el).close();
-      });
-    }, 3000); // change to 2000 for 2s
+      document.querySelectorAll('.alert').forEach(el =>
+        bootstrap.Alert.getOrCreateInstance(el).close()
+      );
+    }, 3000);
+    history.replaceState({}, document.title, location.pathname);
   });
 </script>
 
