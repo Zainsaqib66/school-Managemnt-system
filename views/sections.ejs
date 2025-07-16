@@ -8,11 +8,7 @@
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Class: <%= className %> › Sections</h3>
-        <button
-          class="btn btn-success"
-          data-bs-toggle="modal"
-          data-bs-target="#addSectionModal"
-        >
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSectionModal">
           <i class="bi bi-plus-circle me-1"></i> Add Section
         </button>
       </div>
@@ -31,7 +27,7 @@
         </div>
       <% } %>
 
-      <!-- Sections List -->
+      <!-- Sections Table -->
       <% if (sections.length === 0) { %>
         <p class="text-center text-muted">No sections created yet.</p>
       <% } else { %>
@@ -45,34 +41,28 @@
             </tr>
           </thead>
           <tbody>
-            <% sections.forEach((sec, i) => { %>
+            <% sections.forEach(sec => { %>
               <tr>
-                <td><%= i + 1 %></td>
+                <td><%= sec.index %></td>
                 <td><%= sec.name %></td>
                 <td><%= sec.studentCount %></td>
                 <td>
-                  <a
-                    href="/classes/<%= encodeURIComponent(className) %>/sections/<%= encodeURIComponent(sec.name) %>"
-                    class="btn btn-sm btn-primary me-1"
-                  >
+                  <a href="/classes/<%= encodeURIComponent(className) %>/sections/<%= encodeURIComponent(sec.name) %>"
+                     class="btn btn-sm btn-primary me-1">
                     <i class="bi bi-eye-fill me-1"></i> View
                   </a>
-                  <button
-                    class="btn btn-sm btn-warning me-1"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editSectionModal"
-                    data-id="<%= sec._id %>"
-                    data-name="<%= sec.name %>"
-                  >
+                  <button class="btn btn-sm btn-warning me-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editSectionModal"
+                          data-id="<%= sec._id %>"
+                          data-name="<%= sec.name %>">
                     <i class="bi bi-pencil-square me-1"></i> Edit
                   </button>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteSectionModal"
-                    data-id="<%= sec._id %>"
-                    data-name="<%= sec.name %>"
-                  >
+                  <button class="btn btn-sm btn-danger"
+                          data-bs-toggle="modal"
+                          data-bs-target="#deleteSectionModal"
+                          data-id="<%= sec._id %>"
+                          data-name="<%= sec.name %>">
                     <i class="bi bi-trash-fill me-1"></i> Delete
                   </button>
                 </td>
@@ -100,12 +90,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <input
-            name="name"
-            class="form-control"
-            placeholder="Section Name"
-            required
-          >
+          <input name="name" class="form-control" placeholder="Section Name" required>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">
@@ -130,12 +115,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <input
-            name="name"
-            id="editSectionName"
-            class="form-control"
-            required
-          >
+          <input name="name" id="editSectionName" class="form-control" required>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal">
@@ -176,21 +156,35 @@
 </div>
 
 <script>
-  // Edit Section Modal wiring
+  const currentClass = '<%= encodeURIComponent(className) %>';
+
+  // Edit Section Modal
   document.getElementById('editSectionModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('editSectionName').value = btn.dataset.name;
     document.getElementById('editSectionForm').action =
-      `/classes/${encodeURIComponent(className)}/sections/edit/${btn.dataset.id}`;
+      `/classes/${currentClass}/sections/edit/${btn.dataset.id}`;
   });
 
-  // Delete Section Modal wiring
+  // Delete Section Modal
   document.getElementById('deleteSectionModal').addEventListener('show.bs.modal', e => {
     const btn = e.relatedTarget;
     document.getElementById('deleteSectionName').textContent = btn.dataset.name;
     document.getElementById('deleteSectionForm').action =
-      `/classes/${encodeURIComponent(className)}/sections/delete/${btn.dataset.id}`;
+      `/classes/${currentClass}/sections/delete/${btn.dataset.id}`;
   });
 </script>
+
+<!-- Auto-dismiss alerts after 3s -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.alert').forEach(el => {
+        bootstrap.Alert.getOrCreateInstance(el).close();
+      });
+    }, 3000);
+  });
+</script>
+
 </body>
 </html>

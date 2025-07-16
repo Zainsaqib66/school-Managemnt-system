@@ -5,7 +5,6 @@ const Section = require('../models/section');
 const Student = require('../models/student');
 
 // JSON API: get list of section names for a given class
-// GET /classes/api/:className
 router.get('/api/:className', async (req, res) => {
   try {
     const { className } = req.params;
@@ -21,7 +20,6 @@ router.get('/api/:className', async (req, res) => {
 });
 
 // LIST all sections for a class, with student counts
-// GET /classes/:className/sections
 router.get('/:className/sections', async (req, res) => {
   const { className } = req.params;
 
@@ -36,8 +34,9 @@ router.get('/:className/sections', async (req, res) => {
   const countMap = {};
   counts.forEach(c => { countMap[c._id] = c.count; });
 
-  // attach counts
-  const withCounts = sections.map(s => ({
+  // attach counts and index for display
+  const withCounts = sections.map((s, i) => ({
+    index: i + 1,
     _id: s._id,
     name: s.name,
     studentCount: countMap[s.name] || 0
@@ -57,38 +56,69 @@ router.get('/:className/sections/:sectionName', async (req, res) => {
   const students = await Student
     .find({ className, section: sectionName })
     .sort('rollNumber');
-  res.render('sectionStudents', {
-    className,
-    sectionName,
-    students
-  });
+  res.render('sectionStudents', { className, sectionName, students });
 });
 
 // CREATE a section
 router.post('/:className/sections/add', async (req, res) => {
   const { className } = req.params;
   const { name } = req.body;
-  if (!name) return res.redirect(`/classes/${encodeURIComponent(className)}/sections?error=Name+required`);
+  if (!name) {
+    return res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?error=Name+required`
+    );
+  }
   try {
     await Section.create({ name, className });
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?message=Added`);
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?message=Section+added`
+    );
   } catch (err) {
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?error=${encodeURIComponent(err.message)}`);
+    console.error(err);
+    const msg = err.code === 11000
+      ? 'Section already exists in this class'
+      : err.message;
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?error=${encodeURIComponent(msg)}`
+    );
   }
 });
 
-// EDIT a section
+// EDIT a section (and re-link its students)
 router.post('/:className/sections/edit/:id', async (req, res) => {
   const { className, id } = req.params;
   const { name } = req.body;
-  if (!name) return res.redirect(`/classes/${encodeURIComponent(className)}/sections?error=Name+required`);
+  if (!name) {
+    return res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?error=Name+required`
+    );
+  }
+
   try {
     const sec = await Section.findById(id);
+    if (!sec) throw new Error('Section not found');
+
+    const oldName = sec.name;
     sec.name = name;
     await sec.save();
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?message=Updated`);
-  } catch {
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?error=Unable+to+update`);
+
+    // update students referencing the old section
+    await Student.updateMany(
+      { className, section: oldName },
+      { section: name }
+    );
+
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?message=Section+updated`
+    );
+  } catch (err) {
+    console.error(err);
+    const msg = err.code === 11000
+      ? 'Section already exists in this class'
+      : 'Unable to update section';
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?error=${encodeURIComponent(msg)}`
+    );
   }
 });
 
@@ -97,9 +127,14 @@ router.post('/:className/sections/delete/:id', async (req, res) => {
   const { className, id } = req.params;
   try {
     await Section.findByIdAndDelete(id);
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?message=Deleted`);
-  } catch {
-    res.redirect(`/classes/${encodeURIComponent(className)}/sections?error=Unable+to+delete`);
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?message=Section+deleted`
+    );
+  } catch (err) {
+    console.error(err);
+    res.redirect(
+      `/classes/${encodeURIComponent(className)}/sections?error=Unable+to+delete`
+    );
   }
 });
 

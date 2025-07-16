@@ -2,35 +2,44 @@
 const express = require('express');
 const router  = express.Router();
 const Class   = require('../models/class');
-const Student = require('../models/student');
 const Section = require('../models/section');
+const Student = require('../models/student');
 
-// LIST all classes with student & section counts
+// Helper: count students per class
+async function getStudentCounts() {
+  const agg = await Student.aggregate([
+    { $group: { _id: '$className', count: { $sum: 1 } } }
+  ]);
+  return agg.reduce((map, o) => {
+    map[o._id] = o.count;
+    return map;
+  }, {});
+}
+
+// Helper: count sections per class
+async function getSectionCounts() {
+  const agg = await Section.aggregate([
+    { $group: { _id: '$className', count: { $sum: 1 } } }
+  ]);
+  return agg.reduce((map, o) => {
+    map[o._id] = o.count;
+    return map;
+  }, {});
+}
+
+// LIST all classes
 router.get('/', async (req, res) => {
   try {
-    const classList = await Class.find().sort('name');
+    const classList     = await Class.find().sort('name');
+    const studentCounts = await getStudentCounts();
+    const sectionCounts = await getSectionCounts();
 
-    // student counts
-    const studentCounts = await Student.aggregate([
-      { $group: { _id: '$className', count: { $sum: 1 } } }
-    ]);
-    const studentMap = {};
-    studentCounts.forEach(i => { studentMap[i._id] = i.count; });
-
-    // section counts
-    const sectionCounts = await Section.aggregate([
-      { $group: { _id: '$className', count: { $sum: 1 } } }
-    ]);
-    const sectionMap = {};
-    sectionCounts.forEach(i => { sectionMap[i._id] = i.count; });
-
-    // build array
-    const classes = classList.map((c, idx) => ({
-      index:        idx + 1,
-      _id:          c._id,
-      name:         c.name,
-      studentCount: studentMap[c.name]  || 0,
-      sectionCount: sectionMap[c.name]  || 0
+    const classes = classList.map((c, i) => ({
+      index: i + 1,
+      _id: c._id,
+      name: c.name,
+      studentCount: studentCounts[c.name] || 0,
+      sectionCount: sectionCounts[c.name] || 0
     }));
 
     res.render('classes', {
@@ -43,7 +52,7 @@ router.get('/', async (req, res) => {
     res.render('classes', {
       classes: [],
       message: null,
-      error:   'Unable to load classes'
+      error:   'Unable to fetch classes'
     });
   }
 });
@@ -51,37 +60,77 @@ router.get('/', async (req, res) => {
 // CREATE new class
 router.post('/add', async (req, res) => {
   const { name } = req.body;
-  if (!name) return res.redirect('/classes?error=Name+required');
+  if (!name) {
+    return res.redirect('/classes?error=' + encodeURIComponent('Name required'));
+  }
   try {
     await Class.create({ name });
-    res.redirect('/classes?message=Class+added');
+    res.redirect('/classes?message=' + encodeURIComponent('Class created'));
   } catch (err) {
-    res.redirect('/classes?error=' + encodeURIComponent(err.message));
+    console.error(err);
+    const msg = err.code === 11000 ? 'Class already exists' : err.message;
+    res.redirect('/classes?error=' + encodeURIComponent(msg));
   }
 });
 
-// EDIT class name
-router.post('/edit/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  if (!name) return res.redirect('/classes?error=Name+required');
+// VIEW a class → redirect to sections
+router.get('/:className', (req, res) => {
+  const cn = encodeURIComponent(req.params.className);
+  res.redirect(`/classes/${cn}/sections`);
+});
+
+// SHOW edit‐class form
+router.get('/edit/:id', async (req, res) => {
   try {
-    const cls = await Class.findById(id);
+    const cls = await Class.findById(req.params.id);
+    if (!cls) throw new Error('Not found');
+    res.render('editClass', { error: null, cls });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/classes?error=' + encodeURIComponent('Class not found'));
+  }
+});
+
+// UPDATE class name (and relink all Sections & Students)
+router.post('/edit/:id', async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    return res.render('editClass', {
+      error: 'Name is required',
+      cls: { _id: req.params.id, name: '' }
+    });
+  }
+
+  try {
+    const cls = await Class.findById(req.params.id);
+    if (!cls) throw new Error('Not found');
+
+    const oldName = cls.name;
     cls.name = name;
     await cls.save();
-    res.redirect('/classes?message=Class+updated');
+
+    // update all Sections & Students that referenced the old className
+    await Section.updateMany(
+      { className: oldName },
+      { className: name }
+    );
+    await Student.updateMany(
+      { className: oldName },
+      { className: name }
+    );
+
+    res.redirect('/classes?message=' + encodeURIComponent('Class updated'));
   } catch (err) {
-    res.redirect('/classes?error=Unable+to+update+class');
+    console.error(err);
+    const msg = err.code === 11000 ? 'Class already exists' : err.message;
+    res.render('editClass', {
+      error: msg,
+      cls: { _id: req.params.id, name }
+    });
   }
 });
 
-// REDIRECT class view to sections list
-router.get('/:className', (req, res) => {
-  const c = encodeURIComponent(req.params.className);
-  res.redirect(`/classes/${c}/sections`);
-});
-
-// DELETE class + its students
+// DELETE class + its students & sections
 router.post('/delete/:id', async (req, res) => {
   try {
     const cls = await Class.findByIdAndDelete(req.params.id);
@@ -89,9 +138,10 @@ router.post('/delete/:id', async (req, res) => {
       await Student.deleteMany({ className: cls.name });
       await Section.deleteMany({ className: cls.name });
     }
-    res.redirect('/classes?message=Class+deleted');
-  } catch {
-    res.redirect('/classes?error=Unable+to+delete+class');
+    res.redirect('/classes?message=' + encodeURIComponent('Class and associated data deleted'));
+  } catch (err) {
+    console.error(err);
+    res.redirect('/classes?error=' + encodeURIComponent('Failed to delete class'));
   }
 });
 
