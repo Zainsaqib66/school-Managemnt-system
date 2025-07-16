@@ -2,7 +2,7 @@
 <%- include('partials/nav') %>
 
 <div class="container my-5">
-  <div class="card mx-auto shadow-lg" style="max-width:700px; border-radius:1rem;">
+  <div class="card mx-auto shadow" style="max-width:900px; border-radius:1rem; background:#fff;">
     <div class="card-body p-5">
       <h2 class="text-center mb-4">Add Student</h2>
 
@@ -13,191 +13,99 @@
       <% const s = (typeof student !== 'undefined' && student) ? student : {}; %>
 
       <form action="/students/add" method="POST" novalidate>
-        <!-- Name -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Name</label>
-          <input
-            name="name"
-            type="text"
-            class="form-control form-control-lg"
-            placeholder="Enter student's full name"
-            value="<%= s.name||'' %>"
-            required
-          >
-        </div>
+        <!-- Student Info -->
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Student Information</legend>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Name <span class="text-danger">*</span></label>
+              <input name="name" type="text" class="form-control" placeholder="Full name" value="<%= s.name || '' %>" required title="Enter student's full name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Roll Number <span class="text-danger">*</span></label>
+              <input name="rollNumber" type="number" class="form-control" placeholder="Roll number" value="<%= s.rollNumber || '' %>" required title="Enter roll number (numeric only)">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Class <span class="text-danger">*</span></label>
+              <select name="className" class="form-control text-dark" required title="Select the class">
+                <option value="" disabled <%= !s.className ? 'selected' : '' %>>Select class…</option>
+                <% classes.forEach(c => { %>
+                  <option value="<%= c.name %>" <%= s.className === c.name ? 'selected' : '' %>><%= c.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Section</label>
+              <input name="section" type="text" class="form-control" placeholder="e.g. A" value="<%= s.section || '' %>" title="Enter section name (optional)">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Date of Birth</label>
+              <input name="dob" type="date" class="form-control" value="<%= s.dob ? s.dob.toISOString().split('T')[0] : '' %>" title="Select date of birth">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Admission Date</label>
+              <input name="admissionDate" type="date" class="form-control" value="<%= s.admissionDate ? s.admissionDate.toISOString().split('T')[0] : '' %>" title="Select admission date">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Gender</label>
+              <select name="gender" class="form-control text-dark" title="Select gender">
+                <option value="" disabled <%= !s.gender ? 'selected' : '' %>>Select gender…</option>
+                <option value="M" <%= s.gender === 'M' ? 'selected' : '' %>>Male</option>
+                <option value="F" <%= s.gender === 'F' ? 'selected' : '' %>>Female</option>
+                <option value="Other" <%= s.gender === 'Other' ? 'selected' : '' %>>Other</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
 
-        <!-- Roll Number -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Roll Number</label>
-          <input
-            name="rollNumber"
-            type="number"
-            class="form-control form-control-lg"
-            placeholder="Enter roll number"
-            value="<%= s.rollNumber||'' %>"
-            required
-          >
-        </div>
-
-        <!-- Class -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Class</label>
-          <select
-            name="className"
-            class="form-control form-control-lg text-dark"
-            required
-          >
-            <option value="" disabled <%= !s.className?'selected':'' %>>
-              Select class…
-            </option>
-            <% classes.forEach(c => { %>
-              <option
-                value="<%= c.name %>"
-                <%= s.className===c.name?'selected':'' %>
-              ><%= c.name %></option>
-            <% }) %>
-          </select>
-        </div>
-
-        <!-- Date of Birth -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Date of Birth</label>
-          <input
-            name="dob"
-            type="date"
-            class="form-control form-control-lg"
-            value="<%= s.dob
-                      ? s.dob.toISOString().split('T')[0]
-                      : '' %>"
-          >
-        </div>
-
-        <!-- Gender -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Gender</label>
-          <select
-            name="gender"
-            class="form-control form-control-lg text-dark"
-          >
-            <option value="" disabled <%= !s.gender?'selected':'' %>>
-              Select gender…
-            </option>
-            <option value="M" <%= s.gender==='M'?'selected':'' %>>Male</option>
-            <option value="F" <%= s.gender==='F'?'selected':'' %>>Female</option>
-            <option value="Other" <%= s.gender==='Other'?'selected':'' %>>Other</option>
-          </select>
-        </div>
-
-        <!-- Address -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Address</label>
-          <input
-            name="address"
-            type="text"
-            class="form-control form-control-lg"
-            placeholder="Enter home address"
-            value="<%= s.address||'' %>"
-          >
-        </div>
-
-        <!-- Phone -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Phone</label>
-          <input
-            name="phone"
-            type="tel"
-            class="form-control form-control-lg"
-            placeholder="Enter phone number"
-            value="<%= s.phone||'' %>"
-          >
-        </div>
-
-        <!-- Email -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Email</label>
-          <input
-            name="email"
-            type="email"
-            class="form-control form-control-lg"
-            placeholder="Enter email address"
-            value="<%= s.email||'' %>"
-          >
-        </div>
+        <!-- Contact Info -->
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Contact Information</legend>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Phone</label>
+              <input name="phone" type="tel" pattern="[0-9]{10,15}" class="form-control" placeholder="e.g. 03001234567" value="<%= s.phone || '' %>" title="Enter phone number (10-15 digits)">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Email</label>
+              <input name="email" type="email" class="form-control" placeholder="Email address" value="<%= s.email || '' %>" title="Enter valid email address">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label fw-bold">Address</label>
+              <input name="address" type="text" class="form-control" placeholder="Home address" value="<%= s.address || '' %>" title="Enter home address">
+            </div>
+          </div>
+        </fieldset>
 
         <!-- Guardian Info -->
-        <div class="row gx-3 mb-4">
-          <div class="col">
-            <label class="form-label fw-bold">Father’s Name</label>
-            <input
-              name="fatherName"
-              type="text"
-              class="form-control form-control-lg"
-              placeholder="Father’s name"
-              value="<%= s.guardian?.fatherName||'' %>"
-            >
+        <fieldset class="border p-3 mb-4">
+          <legend class="w-auto px-2 fs-5 fw-bold">Guardian Information</legend>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Father’s Name</label>
+              <input name="fatherName" type="text" class="form-control" placeholder="Father’s name" value="<%= s.guardian?.fatherName || '' %>" title="Enter father's name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Mother’s Name</label>
+              <input name="motherName" type="text" class="form-control" placeholder="Mother’s name" value="<%= s.guardian?.motherName || '' %>" title="Enter mother's name">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold">Guardian Contact</label>
+              <input name="guardianContact" type="tel" pattern="[0-9]{10,15}" class="form-control" placeholder="e.g. 03001234567" value="<%= s.guardian?.contact || '' %>" title="Enter guardian's contact number (10-15 digits)">
+            </div>
           </div>
-          <div class="col">
-            <label class="form-label fw-bold">Mother’s Name</label>
-            <input
-              name="motherName"
-              type="text"
-              class="form-control form-control-lg"
-              placeholder="Mother’s name"
-              value="<%= s.guardian?.motherName||'' %>"
-            >
-          </div>
-        </div>
+        </fieldset>
 
-        <div class="mb-4">
-          <label class="form-label fw-bold">Guardian Contact</label>
-          <input
-            name="guardianContact"
-            type="tel"
-            class="form-control form-control-lg"
-            placeholder="Guardian phone number"
-            value="<%= s.guardian?.contact||'' %>"
-          >
-        </div>
-
-        <!-- Admission Date -->
-        <div class="mb-4">
-          <label class="form-label fw-bold">Admission Date</label>
-          <input
-            name="admissionDate"
-            type="date"
-            class="form-control form-control-lg"
-            value="<%= s.admissionDate
-                      ? s.admissionDate.toISOString().split('T')[0]
-                      : '' %>"
-          >
-        </div>
-
-        <!-- Section -->
-        <div class="mb-5">
-          <label class="form-label fw-bold">Section</label>
-          <input
-            name="section"
-            type="text"
-            class="form-control form-control-lg"
-            placeholder="Enter section (e.g. A)"
-            value="<%= s.section||'' %>"
-          >
-        </div>
-
-        <div class="text-center">
-          <button type="submit"
-                  class="btn btn-primary btn-lg px-5">
-            Add Student
+        <!-- Actions -->
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-person-plus-fill me-1"></i> Add Student
           </button>
-          <a href="/students"
-             class="btn btn-secondary btn-lg px-4 ms-3">
-            Cancel
+          <a href="/students" class="btn btn-secondary px-4 ms-2">
+            <i class="bi bi-x-circle me-1"></i> Cancel
           </a>
         </div>
       </form>
     </div>
   </div>
 </div>
-
-</body>
-</html>

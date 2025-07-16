@@ -1,20 +1,40 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-gradient mb-4">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">SchoolMgmt</a>
+    <a class="navbar-brand fw-bold text-white" href="/">
+      <i class="bi bi-mortarboard-fill me-2"></i>SchoolMgmt
+    </a>
     <button
-      class="navbar-toggler"
+      class="navbar-toggler border-0"
       type="button"
       data-bs-toggle="collapse"
       data-bs-target="#navbarNav"
       aria-controls="navbarNav"
       aria-expanded="false"
       aria-label="Toggle navigation"
-    ><span class="navbar-toggler-icon"></span></button>
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/classes">Classes</a></li>
-        <li class="nav-item"><a class="nav-link" href="/students">Students</a></li>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/">
+            <i class="bi bi-house-door-fill me-1"></i>Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/classes">
+            <i class="bi bi-journal-text me-1"></i>Classes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/students">
+            <i class="bi bi-people-fill me-1"></i>Students
+          </a>
+        </li>
       </ul>
     </div>
   </div>
