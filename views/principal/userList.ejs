@@ -1,0 +1,36 @@
+<%- include('../partials/head',{ title:'Users' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5">
+  <div class="d-flex justify-content-between mb-3">
+    <h3>Teachers & Students</h3>
+    <a href="/principal/users/add" class="btn btn-success">
+      <i class="bi bi-plus-circle me-1"></i> Add User
+    </a>
+  </div>
+
+  <% if (error)   { %><div class="alert alert-danger"><%= error %></div><% } %>
+  <% if (message) { %><div class="alert alert-success"><%= message %></div><% } %>
+
+  <table class="table table-striped">
+    <thead><tr>
+      <th>Name</th><th>Email</th><th>Username</th><th>Role</th><th>Actions</th>
+    </tr></thead>
+    <tbody>
+      <% users.forEach(u=>{ %>
+        <tr>
+          <td><%= u.name %></td>
+          <td><%= u.email %></td>
+          <td><%= u.username %></td>
+          <td><%= u.role %></td>
+          <td>
+            <a href="/admin/users/view/<%=u._id%>" class="btn btn-sm btn-info">View</a>
+            <a href="/admin/users/edit/<%=u._id%>" class="btn btn-sm btn-warning">Edit</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

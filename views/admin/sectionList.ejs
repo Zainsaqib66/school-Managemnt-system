@@ -1,0 +1,36 @@
+<%- include('../partials/head', { title: 'Sections' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5">
+  <h2 class="mb-4">Sections in Class: <%= classItem.name %></h2>
+
+  <form action="/admin/classes/<%= classItem._id %>/sections/create" method="POST" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="name" class="form-control" placeholder="Enter new section name" required>
+      <button class="btn btn-primary" type="submit">Add Section</button>
+    </div>
+  </form>
+
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>Section Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% sections.forEach(sec => { %>
+        <tr>
+          <td><%= sec.name %></td>
+          <td>
+            <a href="/admin/sections/<%= sec._id %>/students" class="btn btn-sm btn-secondary">View Students</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <a href="/admin/classes" class="btn btn-sm btn-outline-secondary mt-4">← Back to Classes</a>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,56 @@
+<%- include('../partials/head', { title: 'Add User' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5" style="max-width: 500px;">
+  <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+  <form action="/admin/users/add" method="POST">
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input name="name" class="form-control" value="<%= form.name || '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input name="email" type="email" class="form-control" value="<%= form.email || '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Username</label>
+      <input name="username" class="form-control" value="<%= form.username || '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Role</label>
+      <select name="role" id="roleSel" class="form-select" required>
+        <option value="" disabled>Select role…</option>
+        <% roles.forEach(r => { %>
+          <option value="<%= r %>" <%= form.role === r ? 'selected' : '' %>><%= r %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="mb-3 d-none" id="teacherFields">
+      <label class="form-label">Subject</label>
+      <input name="subject" class="form-control" value="<%= form.subject || '' %>">
+      <label class="form-label mt-2">Class</label>
+      <select name="className" class="form-select">
+        <option value="">-- none --</option>
+        <% classes.forEach(c => { %>
+          <option value="<%= c.name %>" <%= form.className === c.name ? 'selected' : '' %>><%= c.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Initial Password</label>
+      <input name="password" type="password" class="form-control" required>
+    </div>
+    <button class="btn btn-success">Create User</button>
+  </form>
+</div>
+
+<script>
+  const roleSel = document.getElementById('roleSel');
+  const teacherFields = document.getElementById('teacherFields');
+  roleSel.addEventListener('change', e => {
+    teacherFields.classList.toggle('d-none', e.target.value !== 'teacher');
+  });
+</script>
+
+</body>
+</html>

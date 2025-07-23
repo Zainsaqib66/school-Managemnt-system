@@ -1,0 +1,51 @@
+<%- include('../partials/head', { title: 'Edit Student' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5" style="max-width: 600px;">
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <form action="/students/edit/<%= student._id %>" method="POST" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Name</label>
+      <input name="name" class="form-control" value="<%= student.name %>" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input name="email" type="email" class="form-control" value="<%= student.email %>" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Username</label>
+      <input name="username" class="form-control" value="<%= student.username %>" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Class</label>
+      <select name="className" class="form-select" required>
+        <option value="" disabled>Select class…</option>
+        <% classes.forEach(c => { %>
+          <option value="<%= c.name %>" <%= student.className === c.name ? 'selected' : '' %>><%= c.name %></option>
+        <% }); %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Roll Number</label>
+      <input name="rollNumber" type="number" class="form-control" value="<%= student.rollNumber %>" required />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Section</label>
+      <input name="section" class="form-control" value="<%= student.section %>" required />
+    </div>
+
+    <button class="btn btn-warning">Update Student</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ mongoose.connect('mongodb://127.0.0.1/schooldb1', {
 }).then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ DB Connection Error:", err));
 
-// User Schema
+// User Schema and Model
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -24,16 +24,18 @@ const userSchema = new mongoose.Schema({
   role: String,
   username: String
 });
+
+// Password compare method
 userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
+
 const User = mongoose.model('User', userSchema);
 
-// Middleware Setup
+// Middleware & View Engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
   secret: 'mysecretkey',
@@ -44,12 +46,12 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport Config
+// Passport Local Strategy
 passport.use(new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, done) => {
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email });
     if (!user) return done(null, false, { message: 'Email not found' });
 
     const match = await user.comparePassword(password);
@@ -60,46 +62,45 @@ passport.use(new LocalStrategy({
     return done(err);
   }
 }));
-passport.serializeUser((user, done) => done(null, user._id));
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
-    done(null, user || false);
+    if (!user) return done(null, false);
+    done(null, user);
   } catch (err) {
     done(err);
   }
 });
 
-// Routes
+// Import route files
+const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const classRoutes = require('./routes/classRoutes');
+const principalRoutes = require('./routes/principalRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+const homeRoutes = require('./routes/homeRoutes');
+
+// Use routes
+app.use('/', authRoutes);
 app.use('/', adminRoutes);
+app.use('/', studentRoutes);
+app.use('/', classRoutes);
+app.use('/', principalRoutes);
+app.use('/', teacherRoutes);
+app.use('/', homeRoutes);
 
-// Auth Routes
-app.get('/', (req, res) => res.redirect('/login'));
-app.get('/login', (req, res) => res.render('login', { error: req.flash('error') }));
-app.post('/login',
-  passport.authenticate('local', {
-    failureRedirect: '/login',
-    failureFlash: true
-  }),
-  (req, res) => {
-    if (req.user.role === 'admin') return res.redirect('/admin');
-    if (req.user.role === 'principal') return res.redirect('/principal');
-    res.redirect('/home');
-  }
-);
-app.get('/logout', (req, res) => {
-  req.logout(() => res.redirect('/login'));
-});
-app.get('/home', (req, res) => {
-  if (!req.isAuthenticated()) return res.redirect('/login');
-  res.send(`<h2>Welcome ${req.user.name} (${req.user.role})</h2><a href="/logout">Logout</a>`);
-});
-app.get('/principal', (req, res) => {
-  if (!req.isAuthenticated() || req.user.role !== 'principal') return res.redirect('/login');
-  res.send(`<h2>Principal Panel</h2><a href="/logout">Logout</a>`);
+// Root redirect
+app.get('/', (req, res) => {
+  res.redirect('/login');
 });
 
+// Start server
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

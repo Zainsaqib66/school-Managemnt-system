@@ -1,0 +1,62 @@
+<%- include('../partials/head', { title: 'All Students' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">All Students</h2>
+    <a href="/admin/students/add" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-1"></i> Add Student
+    </a>
+  </div>
+
+  <% if (students.length === 0) { %>
+    <p class="text-muted text-center mt-5">No students found.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Roll #</th>
+            <th>Class</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% students.forEach((s, i) => { %>
+            <tr>
+              <td><%= i + 1 %></td>
+              <td><%= s.name %></td>
+              <td><%= s.rollNumber %></td>
+              <td><%= s.className %></td>
+              <td><%= s.email %></td>
+              <td><%= s.phone %></td>
+              <td>
+                <a href="/admin/students/view/<%= s._id %>" class="btn btn-sm btn-info me-1">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="/admin/students/edit/<%= s._id %>" class="btn btn-sm btn-warning me-1">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <form action="/admin/students/delete/<%= s._id %>" method="POST" class="d-inline">
+                  <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <a href="/admin" class="btn btn-outline-secondary mt-4">
+    ← Back
+  </a>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,34 @@
+<%- include('../partials/head', { title: 'Classes' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5">
+  <h2 class="mb-4">All Classes</h2>
+
+  <form action="/admin/classes/create" method="POST" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="name" class="form-control" placeholder="Enter new class name" required>
+      <button class="btn btn-primary" type="submit">Add Class</button>
+    </div>
+  </form>
+
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>Class Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% classes.forEach(cls => { %>
+        <tr>
+          <td><%= cls.name %></td>
+          <td>
+            <a href="/admin/classes/<%= cls._id %>/sections" class="btn btn-sm btn-secondary">View Sections</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

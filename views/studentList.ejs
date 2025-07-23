@@ -1,102 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <%- include('partials/head', { title: 'All Students' }) %>
-</head>
-<body>
-  <%- include('partials/nav') %>
+<%- include('partials/head',{ title:'All Students' }) %>
+<%- include('partials/nav') %>
 
-  <div class="container my-5">
-    <div class="card mx-auto card-glass" style="max-width: 1000px;">
-      <div class="card-body">
+<div class="container my-5">
+  <% if (message) { %>
+    <div class="alert alert-success"><%= message %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
 
-        <% if (typeof message !== 'undefined' && message) { %>
-          <div class="alert alert-success"><%= message %></div>
-        <% } %>
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <label for="studentSearch" class="visually-hidden">Search</label>
-          <input id="studentSearch" class="form-control search-input" placeholder="Search Students…" />
-          <a href="/students/add" class="btn btn-success d-flex align-items-center gap-2">
-            <i class="bi bi-person-plus-fill"></i> Add Student
-          </a>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table table-hover text-white align-middle">
-            <thead class="table-light text-dark">
-              <tr>
-                <th>Name</th>
-                <th>Roll #</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th style="min-width: 160px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% students.forEach(s => { %>
-                <tr>
-                  <td><%= s.name %></td>
-                  <td><%= s.rollNumber %></td>
-                  <td><%= s.createdAt.toLocaleString() %></td>
-                  <td><%= s.updatedAt.toLocaleString() %></td>
-                  <td>
-                    <a href="/students/view/<%= s._id %>" class="btn btn-sm btn-info me-1 d-inline-flex align-items-center">
-                      <i class="bi bi-eye me-1"></i> View
-                    </a>
-                    <a href="/students/edit/<%= s._id %>" class="btn btn-sm btn-warning me-1 d-inline-flex align-items-center">
-                      <i class="bi bi-pencil-fill me-1"></i> Edit
-                    </a>
-                    <button type="button" class="btn btn-sm btn-danger d-inline-flex align-items-center"
-                      data-bs-toggle="modal"
-                      data-bs-target="#deleteModal"
-                      data-id="<%= s._id %>">
-                      <i class="bi bi-trash me-1"></i> Delete
-                    </button>
-                  </td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Students</h2>
+    <a href="/students/add" class="btn btn-success">
+      <i class="bi bi-person-plus-fill me-1"></i> Add Student
+    </a>
   </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-dark">
-        <div class="modal-header border-0">
-          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Are you sure you want to delete this student?
-        </div>
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            Cancel
-          </button>
-          <form id="deleteForm" method="POST" class="d-inline">
-            <button type="submit" class="btn btn-danger">Delete</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-    crossorigin="anonymous">
-  </script>
-  <script>
-    document.getElementById('deleteModal')
-      .addEventListener('show.bs.modal', function (e) {
-        const id = e.relatedTarget.getAttribute('data-id');
-        this.querySelector('#deleteForm').action = '/students/delete/' + id;
-      });
-  </script>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Roll #</th>
+        <th>Class</th>
+        <th>Section</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% students.forEach((s,i) => { %>
+        <tr>
+          <td><%= i+1 %></td>
+          <td><%= s.name %></td>
+          <td><%= s.rollNumber %></td>
+          <td><%= s.className %></td>
+          <td><%= s.section %></td>
+          <td>
+            <a href="/students/view/<%= s._id %>" class="btn btn-sm btn-info">View</a>
+            <a href="/students/edit/<%= s._id %>" class="btn btn-sm btn-warning">Edit</a>
+            <form action="/students/delete/<%= s._id %>" method="POST" class="d-inline"
+                  onsubmit="return confirm('Delete this student?');">
+              <button class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
 </body>
 </html>

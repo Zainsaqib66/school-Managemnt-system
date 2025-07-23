@@ -1,0 +1,44 @@
+<%- include('../partials/head', { title: 'All Users' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5">
+  <h2 class="mb-4">All Users</h2>
+
+  <% if (users && users.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach((user, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= user.name %></td>
+              <td><%= user.email %></td>
+              <td><%= user.username %></td>
+              <td><%= user.role %></td>
+              <td>
+                <a href="/admin/users/edit/<%= user._id %>" class="btn btn-sm btn-warning">Edit</a>
+                <form action="/admin/users/delete/<%= user._id %>" method="POST" class="d-inline">
+                  <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <p class="text-muted text-center mt-5">No users found.</p>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

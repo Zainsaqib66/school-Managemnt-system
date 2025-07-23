@@ -26,6 +26,7 @@
                 required
               >
             </div>
+
             <!-- Roll Number -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Roll Number <span class="text-danger">*</span></label>
@@ -37,6 +38,7 @@
                 required
               >
             </div>
+
             <!-- Class -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Class <span class="text-danger">*</span></label>
@@ -50,13 +52,15 @@
                 <% }) %>
               </select>
             </div>
+
             <!-- Section -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Section <span class="text-danger">*</span></label>
-              <select name="section" id="sectionSelect" class="form-select" required>
-                <option value="" disabled>Select section…</option>
+              <select name="section" id="sectionSelect" class="form-select" required disabled>
+                <option>Loading sections…</option>
               </select>
             </div>
+
             <!-- Date of Birth -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Date of Birth</label>
@@ -67,6 +71,7 @@
                 value="<%= student.dob ? student.dob.toISOString().slice(0,10) : '' %>"
               >
             </div>
+
             <!-- Admission Date -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Admission Date</label>
@@ -77,6 +82,7 @@
                 value="<%= student.admissionDate ? student.admissionDate.toISOString().slice(0,10) : '' %>"
               >
             </div>
+
             <!-- Gender -->
             <div class="col-md-6">
               <label class="form-label fw-bold">Gender</label>
@@ -86,10 +92,6 @@
                 <option value="F" <%= student.gender==='F'?'selected':'' %>>Female</option>
                 <option value="Other" <%= student.gender==='Other'?'selected':'' %>>Other</option>
               </select>
-            </div>
-            <!-- Section input fallback if needed -->
-            <div class="col-md-6 d-none">
-              <input type="text" name="section" class="form-control" value="<%= student.section %>">
             </div>
           </div>
         </fieldset>
@@ -181,10 +183,11 @@
 <script>
   const classSelect   = document.getElementById('classSelect');
   const sectionSelect = document.getElementById('sectionSelect');
-  const preSection    = '<%= student.section||"" %>';
-  const preClass      = '<%= student.className||"" %>';
+  const currentClass  = '<%= student.className %>';
+  const currentSection= '<%= student.section %>';
 
-  async function loadSections(cls, selectDefault = "") {
+  async function loadSections(cls, selected='') {
+    sectionSelect.disabled = true;
     sectionSelect.innerHTML = '<option>Loading…</option>';
     try {
       const res  = await fetch(`/classes/api/${encodeURIComponent(cls)}`);
@@ -192,25 +195,26 @@
       sectionSelect.innerHTML =
         '<option value="" disabled>Select section…</option>' +
         list.map(name =>
-          `<option value="${name}" ${name===selectDefault?'selected':''}>${name}</option>`
+          `<option value="${name}" ${name===selected?'selected':''}>${name}</option>`
         ).join('');
+      sectionSelect.disabled = false;
     } catch {
-      sectionSelect.innerHTML = '<option value="">Error loading</option>';
+      sectionSelect.innerHTML = '<option>Error loading</option>';
     }
   }
 
-  // Reload sections when class changes
+  // On class change
   classSelect.addEventListener('change', () => {
     if (classSelect.value) {
       loadSections(classSelect.value);
     }
   });
 
-  // Initialize on page load
+  // Initialize on load
   window.addEventListener('DOMContentLoaded', () => {
-    if (preClass) {
-      classSelect.value = preClass;
-      loadSections(preClass, preSection);
+    if (currentClass) {
+      classSelect.value = currentClass;
+      loadSections(currentClass, currentSection);
     }
   });
 </script>

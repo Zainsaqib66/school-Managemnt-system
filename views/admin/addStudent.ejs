@@ -1,16 +1,18 @@
-<%- include('partials/head',{ title:'Add Student' }) %>
-<%- include('partials/nav') %>
+<%- include('../partials/head',{ title:'Add Student' }) %>
+<%- include('../partials/nav') %>
 
 <div class="container my-5">
-  <div class="card mx-auto shadow" style="max-width:900px; border-radius:1rem;">
+  <div class="card mx-auto shadow-lg" style="max-width:900px; border-radius:1rem;">
     <div class="card-body p-5">
-      <h2 class="text-center mb-4">Add Student</h2>
+      <h2 class="text-center mb-4">Add New Student</h2>
+
       <% if (error) { %>
         <div class="alert alert-danger"><%= error %></div>
       <% } %>
+
       <form action="/students/add" method="POST" novalidate>
-        <!-- Student Information -->
-        <fieldset class="border p-3 mb-4">
+        <!-- Student Info -->
+        <fieldset class="border p-3 mb-4 rounded-3">
           <legend class="fw-bold">Student Information</legend>
           <div class="row g-3">
             <div class="col-md-6">
@@ -25,10 +27,8 @@
               <label class="form-label">Class *</label>
               <select name="className" id="classSelect" class="form-select" required>
                 <option value="" disabled <%= !student.className?'selected':'' %>>Select class…</option>
-                <% classes.forEach(c=>{ %>
-                  <option value="<%=c.name%>" <%= student.className===c.name?'selected':'' %>>
-                    <%=c.name%>
-                  </option>
+                <% classes.forEach(c => { %>
+                  <option value="<%=c.name%>" <%= student.className===c.name?'selected':'' %>><%=c.name%></option>
                 <% }) %>
               </select>
             </div>
@@ -40,13 +40,11 @@
             </div>
             <div class="col-md-6">
               <label class="form-label">Date of Birth</label>
-              <input name="dob" type="date" class="form-control"
-                value="<%= student.dob ? student.dob.toISOString().slice(0,10) : '' %>">
+              <input name="dob" type="date" class="form-control" value="<%= student.dob ? student.dob.toISOString().slice(0,10) : '' %>">
             </div>
             <div class="col-md-6">
               <label class="form-label">Admission Date</label>
-              <input name="admissionDate" type="date" class="form-control"
-                value="<%= student.admissionDate ? student.admissionDate.toISOString().slice(0,10) : '' %>">
+              <input name="admissionDate" type="date" class="form-control" value="<%= student.admissionDate ? student.admissionDate.toISOString().slice(0,10) : '' %>">
             </div>
             <div class="col-md-6">
               <label class="form-label">Gender</label>
@@ -60,8 +58,8 @@
           </div>
         </fieldset>
 
-        <!-- Contact Information -->
-        <fieldset class="border p-3 mb-4">
+        <!-- Contact Info -->
+        <fieldset class="border p-3 mb-4 rounded-3">
           <legend class="fw-bold">Contact Information</legend>
           <div class="row g-3">
             <div class="col-md-6">
@@ -79,8 +77,8 @@
           </div>
         </fieldset>
 
-        <!-- Guardian Information -->
-        <fieldset class="border p-3 mb-4">
+        <!-- Guardian Info -->
+        <fieldset class="border p-3 mb-4 rounded-3">
           <legend class="fw-bold">Guardian Information</legend>
           <div class="row g-3">
             <div class="col-md-6">
@@ -98,9 +96,9 @@
           </div>
         </fieldset>
 
-        <div class="text-center">
-          <button class="btn btn-primary px-4">Add Student</button>
-          <a href="/students" class="btn btn-secondary px-4">Cancel</a>
+        <div class="text-center mt-4">
+          <button class="btn btn-primary px-5">Add Student</button>
+          <a href="/students" class="btn btn-outline-secondary px-4 ms-2">Cancel</a>
         </div>
       </form>
     </div>
@@ -111,26 +109,28 @@
   const classSelect   = document.getElementById('classSelect');
   const sectionSelect = document.getElementById('sectionSelect');
 
-  async function loadSections(cls, sel='') {
+  async function loadSections(cls, sel = '') {
     sectionSelect.disabled = true;
     sectionSelect.innerHTML = '<option>Loading…</option>';
     try {
       const res = await fetch(`/classes/api/${encodeURIComponent(cls)}`);
       const list = await res.json();
       sectionSelect.innerHTML = '<option disabled>Select section…</option>' +
-        list.map(n=>`<option value="${n}" ${n===sel?'selected':''}>${n}</option>`).join('');
+        list.map(n => `<option value="${n}" ${n === sel ? 'selected' : ''}>${n}</option>`).join('');
       sectionSelect.disabled = false;
     } catch {
-      sectionSelect.innerHTML = '<option>Error</option>';
+      sectionSelect.innerHTML = '<option>Error loading</option>';
     }
   }
 
-  classSelect.addEventListener('change', ()=> {
+  classSelect.addEventListener('change', () => {
     if (classSelect.value) loadSections(classSelect.value);
   });
-  window.addEventListener('DOMContentLoaded', ()=> {
-    if (classSelect.value) loadSections(classSelect.value, '<%= student.section||"" %>');
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (classSelect.value) loadSections(classSelect.value, '<%= student.section || "" %>');
   });
 </script>
+
 </body>
 </html>
