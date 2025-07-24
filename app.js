@@ -1,35 +1,36 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const session = require('express-session');
-const flash = require('connect-flash');
-const passport = require('passport');
+const express       = require('express');
+const mongoose      = require('mongoose');
+const session       = require('express-session');
+const flash         = require('connect-flash');
+const passport      = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
-const path = require('path');
+const bcrypt        = require('bcrypt');
+const path          = require('path');
 
 const app = express();
 
-// Connect to MongoDB
+// ─── DATABASE ────────────────────────────────────────────────────────────────
 mongoose.connect('mongodb://127.0.0.1/schooldb1', {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => console.log("✅ MongoDB connected"))
+})
+  .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.error("❌ DB Connection Error:", err));
 
-// User Schema
+// ─── USER MODEL ──────────────────────────────────────────────────────────────
 const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
+  name:     String,
+  email:    String,
   password: String,
-  role: String,
+  role:     String,
   username: String
 });
-userSchema.methods.comparePassword = function (password) {
-  return bcrypt.compare(password, this.password);
+userSchema.methods.comparePassword = function (pw) {
+  return bcrypt.compare(pw, this.password);
 };
 const User = mongoose.model('User', userSchema);
 
-// Middleware Setup
+// ─── MIDDLEWARE SETUP ────────────────────────────────────────────────────────
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
@@ -41,25 +42,25 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport Config
+// ─── PASSPORT CONFIG ────────────────────────────────────────────────────────
 passport.use(new LocalStrategy({
   usernameField: 'email'
 }, async (email, password, done) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return done(null, false, { message: 'Email not found' });
-
     const match = await user.comparePassword(password);
     if (!match) return done(null, false, { message: 'Incorrect password' });
-
     return done(null, user);
   } catch (err) {
     return done(err);
   }
 }));
+
 passport.serializeUser((user, done) => done(null, user._id));
 passport.deserializeUser(async (id, done) => {
   try {
@@ -70,20 +71,22 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Routes
-const adminRoutes = require('./routes/adminRoutes');
+// ─── ROUTES ──────────────────────────────────────────────────────────────────
+// All your admin/class/section/student routes live here:
+const adminRoutes = require('./routes/adminRoutes'); 
 app.use('/', adminRoutes);
 
-// Auth Routes
-app.get('/', (req, res) => res.redirect('/login'));
-app.get('/login', (req, res) => res.render('login', { error: req.flash('error') }));
+// ─── AUTH ROUTES ────────────────────────────────────────────────────────────
+app.get('/',               (req, res) => res.redirect('/login'));
+app.get('/login',          (req, res) => res.render('login', { error: req.flash('error') }));
 app.post('/login',
   passport.authenticate('local', {
     failureRedirect: '/login',
-    failureFlash: true
+    failureFlash:   true
   }),
   (req, res) => {
-    if (req.user.role === 'admin') return res.redirect('/admin');
+    // Redirect based on role
+    if (req.user.role === 'admin')     return res.redirect('/admin');
     if (req.user.role === 'principal') return res.redirect('/principal');
     res.redirect('/home');
   }
@@ -91,6 +94,7 @@ app.post('/login',
 app.get('/logout', (req, res) => {
   req.logout(() => res.redirect('/login'));
 });
+
 app.get('/home', (req, res) => {
   if (!req.isAuthenticated()) return res.redirect('/login');
   res.send(`<h2>Welcome ${req.user.name} (${req.user.role})</h2><a href="/logout">Logout</a>`);
@@ -100,7 +104,8 @@ app.get('/principal', (req, res) => {
   res.send(`<h2>Principal Panel</h2><a href="/logout">Logout</a>`);
 });
 
-const PORT = 3000;
+// ─── START SERVER ───────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

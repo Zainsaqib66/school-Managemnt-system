@@ -1,0 +1,107 @@
+<%- include('../partials/head', { title: 'View Student' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5" style="max-width: 700px;">
+  <div class="card shadow rounded-4">
+    <div class="card-body p-4">
+      <h2 class="text-center mb-4">
+        <i class="bi bi-person-lines-fill me-2"></i>Student Details
+      </h2>
+
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Name:</span>
+          <span class="col-8"><%= student.name %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Roll #:</span>
+          <span class="col-8"><%= student.rollNumber %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Class:</span>
+          <span class="col-8"><%= student.className %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Section:</span>
+          <span class="col-8"><%= student.section %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Email:</span>
+          <span class="col-8"><%= student.email %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Phone:</span>
+          <span class="col-8"><%= student.phone %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">DOB:</span>
+          <span class="col-8"><%= student.dob?.toISOString().slice(0,10) %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Admission:</span>
+          <span class="col-8"><%= student.admissionDate?.toISOString().slice(0,10) %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Gender:</span>
+          <span class="col-8"><%= student.gender %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Address:</span>
+          <span class="col-8"><%= student.address %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Father:</span>
+          <span class="col-8"><%= student.guardian?.fatherName %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Mother:</span>
+          <span class="col-8"><%= student.guardian?.motherName %></span>
+        </li>
+        <li class="list-group-item row">
+          <span class="col-4 fw-semibold">Guardian Contact:</span>
+          <span class="col-8"><%= student.guardian?.contact %></span>
+        </li>
+      </ul>
+
+      <div class="d-flex justify-content-between">
+        <a href="/admin/students" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+          <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <div class="d-flex gap-2">
+          <a href="/admin/students/edit/<%= student._id %>" class="btn btn-warning d-flex align-items-center gap-1">
+            <i class="bi bi-pencil-fill"></i> Edit
+          </a>
+          <button type="button" class="btn btn-danger d-flex align-items-center gap-1"
+                  data-bs-toggle="modal" data-bs-target="#deleteStudentModal">
+            <i class="bi bi-trash-fill"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteStudentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="/admin/students/delete/<%= student._id %>" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">Delete Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong><%= student.name %></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-danger">
+          Yes, Delete
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

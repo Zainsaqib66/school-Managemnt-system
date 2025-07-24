@@ -1,0 +1,129 @@
+<%- include('../partials/head', { title: 'Edit Student' }) %>
+<%- include('../partials/nav') %>
+
+<div class="container my-5" style="max-width: 800px;">
+  <!-- Back Button -->
+  <a href="/admin/students" class="btn btn-outline-secondary btn-sm mb-4">
+    <i class="bi bi-arrow-left-circle me-1"></i> Back to Students
+  </a>
+
+  <h2 class="text-center mb-4"><i class="bi bi-pencil-square me-2"></i>Edit Student</h2>
+
+  <% if (error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <form action="/admin/students/edit/<%= student._id %>" method="POST" novalidate>
+    <!-- Box 1: Personal Information -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white fw-bold">Personal Information</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Name</label>
+            <input name="name" type="text" class="form-control" value="<%= student.name %>" required />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Roll Number</label>
+            <input name="rollNumber" type="text" class="form-control" value="<%= student.rollNumber %>" required />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Class</label>
+            <select name="className" class="form-select" required>
+              <% classes.forEach(c => { %>
+                <option value="<%= c.name %>" <%= student.className === c.name ? 'selected' : '' %>><%= c.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Section</label>
+            <input name="section" type="text" class="form-control" value="<%= student.section %>" required />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box 2: Contact Details -->
+    <div class="card mb-4">
+      <div class="card-header bg-secondary text-white fw-bold">Contact Details</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" value="<%= student.email %>" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Phone</label>
+            <input name="phone" type="text" class="form-control" value="<%= student.phone %>" />
+          </div>
+          <div class="col-12 mb-3">
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-control" rows="2"><%= student.address %></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box 3: Academic Details -->
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white fw-bold">Academic Details</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Date of Birth</label>
+            <input
+              name="dob"
+              type="date"
+              class="form-control"
+              value="<%= student.dob?.toISOString().split('T')[0] %>"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Admission Date</label>
+            <input
+              name="admissionDate"
+              type="date"
+              class="form-control"
+              value="<%= student.admissionDate?.toISOString().split('T')[0] %>"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Gender</label>
+            <select name="gender" class="form-select">
+              <option value="Male" <%= student.gender === 'Male' ? 'selected' : '' %>>Male</option>
+              <option value="Female" <%= student.gender === 'Female' ? 'selected' : '' %>>Female</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box 4: Guardian Details -->
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-white fw-bold">Guardian Details</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Father Name</label>
+            <input name="fatherName" type="text" class="form-control" value="<%= student.guardian?.fatherName %>" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Mother Name</label>
+            <input name="motherName" type="text" class="form-control" value="<%= student.guardian?.motherName %>" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Guardian Contact</label>
+            <input name="guardianContact" type="text" class="form-control" value="<%= student.guardian?.contact %>" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary w-100 mb-3">
+      <i class="bi bi-check2-circle me-1"></i> Update Student
+    </button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
